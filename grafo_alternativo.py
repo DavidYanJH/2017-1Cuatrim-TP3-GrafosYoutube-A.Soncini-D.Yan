@@ -24,25 +24,20 @@ class Grafo:
 
 	def remove_vertice(self, vertice):
 		if self.vertice_exist(vertice):
-			for adyacente in self.grafo[vertice]:
+			for adyacente in self.grafo.pop(vertice):
 				self.grafo[adyacente].remove(vertice)
 				self.aristas -=1	
 			self.vertices -=1
-			self.grafo.pop(vertice)	
 
 		
 	def get_vertices(self):
 		"""Retorna una lista desordenada de todos los vertices del grafo"""
-		return list(self.grafo.keys())
-
-	def get_vertices_ord(self):
-		"""Retorna una lista ordenada de vertices del grafo"""
-		return sorted(self.get_vertices())
+		return self.grafo.keys()
 
 
 	def add_arista(self, verticeA, verticeB):
 		if verticeA in self.grafo and verticeB in self.grafo:
-			if verticeA not in self.grafo[verticeB]:
+			if not self.son_adyacentes(verticeA, verticeB):
 				self.grafo[verticeB].append(verticeA)
 				self.grafo[verticeA].append(verticeB)
 				self.aristas +=1
@@ -52,7 +47,7 @@ class Grafo:
 
 	def remove_arista(self, verticeA, verticeB):
 		if verticeA in self.grafo and verticeB in self.grafo:
-			if verticeA in self.grafo[verticeB]:
+			if self.son_adyacentes(verticeA, verticeB):
 				self.grafo[verticeA].remove(verticeB)
 				self.grafo[verticeB].remove(verticeA)
 				self.aristas -=1
@@ -60,7 +55,7 @@ class Grafo:
 
 	def get_adyacentes(self, vertice):
 		if self.vertice_exist(vertice):
-			return list(self.grafo[vertice])
+			return self.grafo[vertice]
 		return None
 
 	def son_adyacentes(self, verticeA, verticeB):
@@ -80,6 +75,11 @@ def main():
 	grafo.add_vertice(4)
 	print("El grafo tiene {} vertices".format(grafo.vertices))
 	print("El grafo tiene {} aristas".format(grafo.aristas))
+
+	print("Los vertices existentes en el grafo son:")
+	lista = grafo.get_vertices() 
+	for vertice in lista:
+		print("Vertice {}".format(vertice))
 
 	print("Elimino el vertice 3")
 	grafo.remove_vertice(3)
@@ -113,6 +113,11 @@ def main():
 	grafo.add_arista(1, 3)
 	grafo.add_arista(1, 4)
 	print("El grafo tiene {} aristas".format(grafo.aristas))
+
+	print("Se quita el arista 1-4")
+	grafo.remove_arista(1, 4)
+	print("El grafo tiene {} aristas".format(grafo.aristas))
+	print("v1 y v4 no son adyacentes {}".format(not grafo.son_adyacentes(1,4)))
 
 	adyacentes = grafo.get_adyacentes(1)
 	for vertice in adyacentes:
