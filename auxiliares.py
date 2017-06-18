@@ -28,3 +28,16 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 			walk.append(v_actual)
 		lista_walks.append(walk)
 	return lista_walks
+
+def grafo_stats(grafo):
+	print("-----------Datos Estadisticos del Grafo------------")
+	print("Cantidad de Vertices del Grafo: {}".format(grafo.vertices))
+	print("Cantidad de Aristas del Grafo: {}".format(grafo.aristas))
+	vertices = float(grafo.vertices)
+	aristas = float(grafo.aristas)
+	grado_promedio = aristas / vertices
+	print("Promedio de Grado de Entrada de cada Vertice: {:.2f}".format(grado_promedio))
+	print("Promedio de Grado de Salida de cada Vertice: {:.2f}".format(grado_promedio))
+	max_arista = vertices * (vertices - 1) / 2
+	densidad_relat = aristas / max_arista
+	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
