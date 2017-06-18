@@ -151,3 +151,8 @@ def pruebas():
 	lista_walks = random_walks(grafo, None, 3, 0)
 	if lista_walks is None:	
 		print("None ya que la cantidad de random walks a realizar es 0\n")	
+		
+	"""******************************Test: Iteracion del Grafo**************************"""
+	print("Listado de todos los Vertices existentes en el Grafo:")
+	for i in grafo:
+		print("Vertice {}".format(i))			
