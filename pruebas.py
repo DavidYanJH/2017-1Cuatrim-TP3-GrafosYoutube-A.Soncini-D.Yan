@@ -155,4 +155,10 @@ def pruebas():
 	"""******************************Test: Iteracion del Grafo**************************"""
 	print("Listado de todos los Vertices existentes en el Grafo:")
 	for i in grafo:
-		print("Vertice {}".format(i))			
+		print("Vertice {}".format(i))	
+	print("")
+	
+	"""********************************Grafo Stats Test******************************"""
+	grafo_stats(grafo)
+	print("")
+
