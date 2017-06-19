@@ -129,13 +129,11 @@ def pruebas():
 	print("Test Simple de Random_Walks\n")
 	print("3 random walks de longitud 6 desde el vertice 0")
 	lista_walks = random_walks(grafo, 0, 9, 3)
-	print(type(lista_walks))
 	for i in range(3):
 		print(lista_walks[i])
 	print("")	
 	print("8 random walks de longitud 6 desde un vertice aleatorio")
 	lista_walks = random_walks(grafo, None, 6, 8)
-	print(type(lista_walks))
 	for i in range(8):
 		print(lista_walks[i])
 	print("")
@@ -153,3 +151,37 @@ def pruebas():
 	lista_walks = random_walks(grafo, None, 3, 0)
 	if lista_walks is None:	
 		print("None ya que la cantidad de random walks a realizar es 0\n")	
+		
+	"""******************************Test: Iteracion del Grafo**************************"""
+	print("Listado de todos los Vertices existentes en el Grafo:")
+	for i in grafo:
+		print("Vertice {}".format(i))	
+	print("")
+	
+	"""********************************Grafo Stats Test******************************"""
+	grafo_stats(grafo)
+	print("")
+
+	"""**************************Grafo Carga & Similares Test************************"""
+	grafo = Grafo()
+	cargar_grafo(grafo)
+	"""*********************************Fin de Carga Test****************************"""
+
+	print("*********************************Similares a 1********************************")
+	similares(grafo, "1", 5)
+	print("*********************************Similares a 4********************************")
+	similares(grafo, "4", 10)
+	print("*********************************Similares a 10420****************************")
+	similares(grafo, "10420", 8)
+	print("")
+
+	print("*********************************Recomendar a 1********************************")
+	recomendar(grafo, "1", 5)
+	print("*********************************Recomendar a 4********************************")
+	recomendar(grafo, "4", 10)
+	print("*********************************Recomendar a 10420****************************")
+	recomendar(grafo, "10420", 8)
+
+	"""********************************Grafo Stats Test******************************"""
+	grafo_stats(grafo)
+	print("*********************************Fin de los Test******************************")

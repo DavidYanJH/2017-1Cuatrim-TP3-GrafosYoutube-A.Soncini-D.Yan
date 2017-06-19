@@ -1,5 +1,5 @@
 import random
-import heapq
+from heapq import *
 
 def cargar_grafo(grafo):
 	file = open('com-youtube.ungraph.txt', 'r')
@@ -54,36 +54,67 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 		lista_walks.append(walk)
 	return lista_walks
 
-def similares(grafo, userid, cantsem, lista_walks):
-	print(type(lista_walks))
+def grafo_stats(grafo):
+	print("-----------Datos Estadisticos del Grafo------------")
+	print("Cantidad de Vertices del Grafo: {}".format(grafo.vertices))
+	print("Cantidad de Aristas del Grafo: {}".format(grafo.aristas))
+	vertices = float(grafo.vertices)
+	aristas = float(grafo.aristas)
+	grado_promedio = aristas / vertices
+	print("Promedio de Grado de Entrada de cada Vertice: {:.2f}".format(grado_promedio))
+	print("Promedio de Grado de Salida de cada Vertice: {:.2f}".format(grado_promedio))
+	max_arista = vertices * (vertices - 1) / 2
+	densidad_relat = aristas / max_arista
+	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
+
+def obtener_lista_semejantes(grafo, userid):
+	lista_walks = random_walks(grafo, userid, 20000, 100)
 	diccionario = {}
-	largo = len(lista)
-
-	for i in range(largo):
-		print(lista[i])
-	print("")
-
+	total = 0
+	#Realizo el conteo de apariciones totales por usuario (utilizo diccionario)
 	for caminos in lista_walks:
 		for vertice in caminos:
 			if vertice in diccionario:
-				diccinario[vertice] +=1
+				diccionario[vertice] +=1
 			else:
-				diccionario[vertice] = 0
+				diccionario[vertice] = 1
+				total +=1
 	heap = []
-	cont = 0
+	#Ingreso todos los valores en Heap
 	for user in diccionario:
 		tupla = (diccionario[user], user)
-		if cont < cantsem:
-			heappush(heap, tupla)
-		else:
-			heappushpop(heap, tupla)
+		heappush(heap, tupla)
 
 	listaord = []
-	for i in range(cantsem):
+	#Heapsort
+	for i in range(total):
 		listaord.append(heappop(heap))
 
-	print("Similares: ", end='')
-	for i in range(cantsem):
+	#Quito al mismo usuario del resultado
+	listaord.pop()
+	return listaord
+
+def similares(grafo, userid, cantsimil):
+	"""Calcula la cantidad 'cantsimil' de usuarios semejantes a 'userid', 
+	   Siendo los usuarios similares aquellos que aparecen mas veces en
+	   los sucesivos caminos aleatorios."""
+	listaord = obtener_lista_semejantes(grafo, userid)
+	listafin = []
+	for i in range(cantsimil):
 		tupla = (listaord.pop())
-		print("{} ".format(tupla[1]), end='')
-	print(".")
+		listafin.append(tupla[1])
+	charf = ", ".join(listafin)
+	print(charf)
+
+def recomendar(grafo, userid, cantrecom):
+	listaord = obtener_lista_semejantes(grafo, userid)
+	total = len(listaord)
+	listafin = []
+	for i in range(total):
+		tupla = listaord.pop()
+		if not grafo.son_adyacentes(userid, tupla[1]):
+			listafin.append(tupla[1])
+			if len(listafin) == cantrecom:
+				break
+	charf = ", ".join(listafin)
+	print(charf)
