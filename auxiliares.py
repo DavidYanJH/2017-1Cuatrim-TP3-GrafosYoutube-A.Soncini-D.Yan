@@ -1,4 +1,29 @@
 import random
+import heapq
+
+def cargar_grafo(grafo):
+	file = open('com-youtube.ungraph.txt', 'r')
+	linea = file.readline()
+	linea = linea.rstrip("\n")
+
+	while (linea != ''):
+		if not (linea[0] == '#'):
+			lista = linea.split("\t")
+			verticeant = lista[0]
+			grafo.add_vertice(verticeant)
+			while (linea != '') and (verticeant == lista[0]):
+				grafo.add_vertice(lista[1])
+				grafo.add_arista(verticeant, lista[1])
+				linea = file.readline()
+				linea = linea.rstrip("\n")
+				lista = linea.split("\t")
+		else:
+			linea = file.readline()
+			linea = linea.rstrip("\n")
+
+	file.close()
+	#print("El grafo quedo con {} Vertices y {} Aristas".format(grafo.vertices, grafo.aristas))
+
 def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 	"""Realiza una serie de random walks o recorridos aleatorios en el grafo dado.
 	   la variable total_walk determina la cantidad de recorridos a realizar;
@@ -29,15 +54,36 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 		lista_walks.append(walk)
 	return lista_walks
 
-def grafo_stats(grafo):
-	print("-----------Datos Estadisticos del Grafo------------")
-	print("Cantidad de Vertices del Grafo: {}".format(grafo.vertices))
-	print("Cantidad de Aristas del Grafo: {}".format(grafo.aristas))
-	vertices = float(grafo.vertices)
-	aristas = float(grafo.aristas)
-	grado_promedio = aristas / vertices
-	print("Promedio de Grado de Entrada de cada Vertice: {:.2f}".format(grado_promedio))
-	print("Promedio de Grado de Salida de cada Vertice: {:.2f}".format(grado_promedio))
-	max_arista = vertices * (vertices - 1) / 2
-	densidad_relat = aristas / max_arista
-	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
+def similares(grafo, userid, cantsem, lista_walks):
+	print(type(lista_walks))
+	diccionario = {}
+	largo = len(lista)
+
+	for i in range(largo):
+		print(lista[i])
+	print("")
+
+	for caminos in lista_walks:
+		for vertice in caminos:
+			if vertice in diccionario:
+				diccinario[vertice] +=1
+			else:
+				diccionario[vertice] = 0
+	heap = []
+	cont = 0
+	for user in diccionario:
+		tupla = (diccionario[user], user)
+		if cont < cantsem:
+			heappush(heap, tupla)
+		else:
+			heappushpop(heap, tupla)
+
+	listaord = []
+	for i in range(cantsem):
+		listaord.append(heappop(heap))
+
+	print("Similares: ", end='')
+	for i in range(cantsem):
+		tupla = (listaord.pop())
+		print("{} ".format(tupla[1]), end='')
+	print(".")

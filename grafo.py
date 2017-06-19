@@ -62,6 +62,3 @@ class Grafo:
 		if verticeB in adyacentes:
 			return True
 		return False
-	
-	def __iter__(self):
-		return iter(self.grafo.keys())	
