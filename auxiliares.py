@@ -56,10 +56,10 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 
 def grafo_stats(grafo):
 	print("-----------Datos Estadisticos del Grafo------------")
-	print("Cantidad de Vertices del Grafo: {}".format(grafo.vertices))
-	print("Cantidad de Aristas del Grafo: {}".format(grafo.aristas))
-	vertices = float(grafo.vertices)
-	aristas = float(grafo.aristas)
+	vertices = grafo.total_vertices()
+	aristas = grafo.total_aristas()
+	print("Cantidad de Vertices del Grafo: {}".format(vertices))
+	print("Cantidad de Aristas del Grafo: {}".format(aristas))
 	grado_promedio = aristas / vertices
 	print("Promedio de Grado de Entrada de cada Vertice: {:.2f}".format(grado_promedio))
 	print("Promedio de Grado de Salida de cada Vertice: {:.2f}".format(grado_promedio))
@@ -118,3 +118,4 @@ def recomendar(grafo, userid, cantrecom):
 				break
 	charf = ", ".join(listafin)
 	print(charf)
+

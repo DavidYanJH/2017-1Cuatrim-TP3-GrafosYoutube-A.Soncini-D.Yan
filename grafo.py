@@ -14,12 +14,14 @@ class Grafo:
 	def vertice_exist(self, vertice):
 		return vertice in self.grafo
 
+
 	def add_vertice(self, vertice):
 		if not self.vertice_exist(vertice):
 			self.grafo[vertice] = []
 			self.vertices +=1
 			return True
 		return False	
+
 
 	def remove_vertice(self, vertice):
 		if self.vertice_exist(vertice):
@@ -57,11 +59,21 @@ class Grafo:
 			return self.grafo[vertice]
 		return None
 
+
 	def son_adyacentes(self, verticeA, verticeB):
 		adyacentes = self.get_adyacentes(verticeA)
 		if verticeB in adyacentes:
 			return True
 		return False
+
 	
+	def total_vertices(self):
+		return self.vertices
+
+
+	def total_aristas(self):
+		return self.aristas	
+
+
 	def __iter__(self):
 		return iter(self.grafo.keys())	
