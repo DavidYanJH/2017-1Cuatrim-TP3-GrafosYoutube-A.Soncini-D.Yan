@@ -1,5 +1,5 @@
 import random
-import heapq
+from heapq import *
 import queue
 
 
