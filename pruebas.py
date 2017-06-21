@@ -1,9 +1,10 @@
 from grafo import Grafo
 from auxiliares import *
+from time import time
 
 def pruebas():
 	"""********************************Simple Test*****************************"""
-	print("Simple Test de las diferentes funciones del Grafo")
+	"""print("Simple Test de las diferentes funciones del Grafo")
 	grafo = Grafo()
 	print("")
 	print("Un grafo vacio ha sido creado exitosamente")
@@ -123,10 +124,10 @@ def pruebas():
 	print("Agrego 1 arista entre 8 y 9")
 	grafo.add_arista(8, 9)
 	print("El grafo finalmente tiene {} aristas".format(grafo.aristas))
-	print("")
+	print("")"""
 
 	"""********************************Random Walks Test*****************************"""
-	print("Test Simple de Random_Walks\n")
+	"""print("Test Simple de Random_Walks\n")
 	print("3 random walks de longitud 6 desde el vertice 0")
 	lista_walks = random_walks(grafo, 0, 9, 3)
 	for i in range(3):
@@ -150,24 +151,30 @@ def pruebas():
 	print("0 random walks de longitud 3 desde un vertice aleatorio")	
 	lista_walks = random_walks(grafo, None, 3, 0)
 	if lista_walks is None:	
-		print("None ya que la cantidad de random walks a realizar es 0\n")	
+		print("None ya que la cantidad de random walks a realizar es 0\n")"""
 		
 	"""******************************Test: Iteracion del Grafo**************************"""
-	print("Listado de todos los Vertices existentes en el Grafo:")
+	"""print("Listado de todos los Vertices existentes en el Grafo:")
 	for i in grafo:
 		print("Vertice {}".format(i))	
-	print("")
+	print("")"""
 	
 	"""********************************Grafo Stats Test******************************"""
-	grafo_stats(grafo)
-	print("")
+	"""grafo_stats(grafo)
+	print("")"""
 
 	"""**************************Grafo Carga & Similares Test************************"""
+	print("*********************Comienzo de los Test*********************")
+	print(".....................Carga del Grafo.....................")
+	time_inicial = time()
 	grafo = Grafo()
 	cargar_grafo(grafo)
+	time_final = time()
+	time_execution = time_final - time_inicial
+	print("Tiempo de Ejecucion de la Carga del Grafo: {}\n".format(time_execution))
 	"""*********************************Fin de Carga Test****************************"""
 
-	print("*********************************Similares a 1********************************")
+	"""print("*********************************Similares a 1********************************")
 	similares(grafo, "1", 5)
 	print("*********************************Similares a 4********************************")
 	similares(grafo, "4", 10)
@@ -180,8 +187,18 @@ def pruebas():
 	print("*********************************Recomendar a 4********************************")
 	recomendar(grafo, "4", 10)
 	print("*********************************Recomendar a 10420****************************")
-	recomendar(grafo, "10420", 8)
+	recomendar(grafo, "10420", 8)"""
 
 	"""********************************Grafo Stats Test******************************"""
 	grafo_stats(grafo)
-	print("*********************************Fin de los Test******************************")
+	print("")
+
+	"""*******************************Distancia Stats Test***************************"""
+	print("Prueba de Distancia con Usuario 9")
+	time_inicial = time()
+	distancia_stats(grafo, "9")
+	time_final = time()
+	time_execution = time_final - time_inicial
+	print("Tiempo de Ejecucion de Distancia de un Vertice: {}\n".format(time_execution))
+
+	print("*********************Fin de los Test*********************")

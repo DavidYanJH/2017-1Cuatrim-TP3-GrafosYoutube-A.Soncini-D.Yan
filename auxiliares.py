@@ -1,5 +1,7 @@
 import random
-from heapq import *
+import heapq
+import queue
+
 
 def cargar_grafo(grafo):
 	file = open('com-youtube.ungraph.txt', 'r')
@@ -35,14 +37,11 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 	   La funcion random_walks retorna una lista con los recorridos aleatorios realizados
 	   en forma de listas de vertices, en caso de error retorna un None."""
 	if v_inicial is not None and not grafo.vertice_exist(v_inicial): return None
-	if lenght_walk <= 1 or total_walk <= 0: return None    
-	   
+	if lenght_walk <= 1 or total_walk <= 0: return None   
 	lista_walks = []
-	
 	if v_inicial is None:
 		vertices = grafo.get_vertices()
 		v_inicial = random.choice(vertices)
-
 	for i in range(total_walk):
 		walk = []
 		walk.append(v_inicial)
@@ -53,6 +52,7 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 			walk.append(v_actual)
 		lista_walks.append(walk)
 	return lista_walks
+
 
 def grafo_stats(grafo):
 	print("-----------Datos Estadisticos del Grafo------------")
@@ -66,6 +66,45 @@ def grafo_stats(grafo):
 	max_arista = vertices * (vertices - 1) / 2
 	densidad_relat = aristas / max_arista
 	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
+
+
+def bfs_visitar(grafo, origen, visitados, antecesores, orden):
+	q = queue.Queue()
+	q.put(origen)
+	visitados[origen] = True
+	while not q.empty():
+		v = q.get()
+		for w in grafo.get_adyacentes(v):
+			if w not in visitados:
+				q.put(w)
+				visitados[w] = True
+				orden[w] = orden[v] + 1
+				antecesores[w] = v
+
+
+def distancia_stats(grafo, userid):
+	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
+	visitados = {}
+	antecesores = {}
+	orden = {}
+	antecesores[userid] = None
+	orden[userid] = 0
+	#BFS con un determinado Vertice/Usuario del Grafo
+	bfs_visitar(grafo, userid, visitados, antecesores, orden)
+	#Consigo la Maxima Distancia al Vertice/Usuario Origen
+	max_distance = max(orden.values())
+	#Inicializacion de una Lista Auxiliar, cuya funcion consiste en contabilizar
+	#las cantidades de usuarios segun la distancia al Vertice/Usuario Origen 
+	distance = [] 
+	for i in range(max_distance + 1):
+		distance.append(0)
+	#Proceso de Contabilizar las cantidades de usuarios segun distancia al Origen
+	for v in visitados:
+		distance[orden[v]] += 1
+	#Mensajes de Salida Estandar
+	for i in range(1, max_distance + 1):
+		print("Distancia {}: {} usuarios".format(i, distance[i]))		
+
 
 def obtener_lista_semejantes(grafo, userid):
 	lista_walks = random_walks(grafo, userid, 20000, 100)
@@ -94,6 +133,7 @@ def obtener_lista_semejantes(grafo, userid):
 	listaord.pop()
 	return listaord
 
+
 def similares(grafo, userid, cantsimil):
 	"""Calcula la cantidad 'cantsimil' de usuarios semejantes a 'userid', 
 	   Siendo los usuarios similares aquellos que aparecen mas veces en
@@ -105,6 +145,7 @@ def similares(grafo, userid, cantsimil):
 		listafin.append(tupla[1])
 	charf = ", ".join(listafin)
 	print(charf)
+
 
 def recomendar(grafo, userid, cantrecom):
 	listaord = obtener_lista_semejantes(grafo, userid)
@@ -118,4 +159,3 @@ def recomendar(grafo, userid, cantrecom):
 				break
 	charf = ", ".join(listafin)
 	print(charf)
-
