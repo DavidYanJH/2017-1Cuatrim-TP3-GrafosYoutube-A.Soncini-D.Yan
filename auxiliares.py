@@ -235,3 +235,39 @@ def comunidades(grafo):
 		if ((cantidad_comunidad > 5) and (cantidad_comunidad < 2000)):
 			print("Comunidad {} tiene {} integrantes".format(comunidad, cantidad_comunidad))
 			print("Integrantes: {}".format(aux[comunidad]))
+
+			
+def centralidad(grafo, n):
+	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
+	print("tengo vertices del grafo")
+	centrales = {}
+	total = 0
+	for i in range(100):
+		print("Ejecucion {}".format(i))
+		v_inicial = random.choice(vertices)
+		similares = obtener_lista_semejantes(grafo, v_inicial)
+		
+		for similar in similares:
+			#print(similar[1])
+			if similar[1] not in centrales:
+				centrales[similar[1]] = 1
+			else:
+				centrales[similar[1]] += 1
+	heap = []
+	#Ingreso todos los valores en Heap
+	for vertice in centrales:
+		tupla = (centrales[vertice], vertice)
+		heappush(heap, tupla)
+		total += 1
+
+	listaord = []
+	#Heapsort
+	for i in range(total):
+		listaord.append(heappop(heap))
+	listafin = []
+	print("Usuarios centrales: ", end='')
+	for usuario in range(n):
+		tupla = listaord.pop()
+		listafin.append(tupla[1])
+	charf = ", ".join(listafin)
+	print(charf)

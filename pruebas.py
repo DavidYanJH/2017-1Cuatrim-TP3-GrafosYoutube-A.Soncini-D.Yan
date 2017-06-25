@@ -67,6 +67,12 @@ def pruebas():
 	time_final = time()
 	time_execution = time_final - time_inicial
 	print("Tiempo de Ejecucion de Comunidades: {}\n".format(time_execution))
-	print("*********************Fin de los Test*********************")
 
+
+	print("Prueba de centralidad")
+	time_inicial = time()
+	centralidad(grafo, 10)
+	time_final = time()
+	time_execution = time_final - time_inicial
+	print("Tiempo de Ejecucion de Centralidad: {}\n".format(time_execution))
 	print("*********************Fin de los Test*********************")
