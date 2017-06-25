@@ -1,5 +1,6 @@
+
 import random
-from heapq import *
+from heapq import heappush, heappop
 import queue
 
 
@@ -24,7 +25,7 @@ def cargar_grafo(grafo):
 			linea = linea.rstrip("\n")
 
 	file.close()
-	#print("El grafo quedo con {} Vertices y {} Aristas".format(grafo.vertices, grafo.aristas))
+
 
 def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 	"""Realiza una serie de random walks o recorridos aleatorios en el grafo dado.
@@ -68,7 +69,8 @@ def grafo_stats(grafo):
 	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
 
 
-def bfs_visitar(grafo, origen, visitados, antecesores, orden):
+
+def bfs_conexion(grafo, origen, visitados, antecesores, orden, destino):
 	q = queue.Queue()
 	q.put(origen)
 	visitados[origen] = True
@@ -76,10 +78,11 @@ def bfs_visitar(grafo, origen, visitados, antecesores, orden):
 		v = q.get()
 		for w in grafo.get_adyacentes(v):
 			if w not in visitados:
-				q.put(w)
+				q.put(w) 
 				visitados[w] = True
 				orden[w] = orden[v] + 1
 				antecesores[w] = v
+				if destino in visitados: return #Condicion de Corte en Caso Necesario
 
 
 def distancia_stats(grafo, userid):
@@ -90,7 +93,7 @@ def distancia_stats(grafo, userid):
 	antecesores[userid] = None
 	orden[userid] = 0
 	#BFS con un determinado Vertice/Usuario del Grafo
-	bfs_visitar(grafo, userid, visitados, antecesores, orden)
+	bfs_conexion(grafo, userid, visitados, antecesores, orden, None)
 	#Consigo la Maxima Distancia al Vertice/Usuario Origen
 	max_distance = max(orden.values())
 	#Inicializacion de una Lista Auxiliar, cuya funcion consiste en contabilizar
@@ -103,7 +106,33 @@ def distancia_stats(grafo, userid):
 		distance[orden[v]] += 1
 	#Mensajes de Salida Estandar
 	for i in range(1, max_distance + 1):
-		print("Distancia {}: {} usuarios".format(i, distance[i]))		
+		print("Distancia {}: {} usuarios".format(i, distance[i]))	
+
+
+def contactos_conexion(grafo, id_origen, id_destino):
+	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
+	visitados = {}
+	antecesores = {}
+	orden = {}
+	antecesores[id_origen] = None
+	orden[id_origen] = 0
+	#BFS de Camino Minimo desde usuario id_origen hacia usuario id_destino
+	bfs_conexion(grafo, id_origen, visitados, antecesores, orden, id_destino)
+	#Verifico la Existencia de Camino o Conexion entre Ambos Usuarios
+	if id_destino in visitados:
+		#Reconstruyo el Camino Minimo Hallado usando una LIFO.Queue/Pila
+		p = queue.LifoQueue()
+		actual = id_destino
+		p.put(actual)
+		for i in range(orden[actual]):
+			actual = antecesores[actual]
+			p.put(actual)
+		#Doy Formato Necesario a la Salida	
+		while not p.empty():
+			actual = p.get()
+			if not p.empty(): print("{}".format(actual), end = " --> ")
+			else: print("{}\n".format(actual))
+	else: print("Imposible Conectar Ambos Usuarios") #Caso sin Conexion		
 
 
 def obtener_lista_semejantes(grafo, userid):
@@ -159,3 +188,5 @@ def recomendar(grafo, userid, cantrecom):
 				break
 	charf = ", ".join(listafin)
 	print(charf)
+
+	
