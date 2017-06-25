@@ -60,4 +60,13 @@ def pruebas():
 	time_execution = time_final - time_inicial
 	print("Tiempo de Ejecucion de Distancia de un Vertice: {}\n".format(time_execution))
 
+
+	print("Prueba de comunidades")
+	time_inicial = time()
+	comunidades(grafo)
+	time_final = time()
+	time_execution = time_final - time_inicial
+	print("Tiempo de Ejecucion de Comunidades: {}\n".format(time_execution))
+	print("*********************Fin de los Test*********************")
+
 	print("*********************Fin de los Test*********************")
