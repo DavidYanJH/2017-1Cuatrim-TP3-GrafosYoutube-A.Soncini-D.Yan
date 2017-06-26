@@ -1,7 +1,7 @@
 import heapq
 
 def get_lista_similares(grafo, userid, cantsimil):
-	lista_walks = random_walks(grafo, userid, 10000, 200)
+	lista_walks = random_walks(grafo, userid, 10000, 100)
 	
 	dicc = {}
 	for walk in lista_walks:
