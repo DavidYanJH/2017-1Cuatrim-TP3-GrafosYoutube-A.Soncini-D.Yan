@@ -238,36 +238,39 @@ def comunidades(grafo):
 
 			
 def centralidad(grafo, n):
-	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
-	print("tengo vertices del grafo")
-	centrales = {}
+	vertices = grafo.get_vertices()								# Obtengo todos los vertices del grafo en una lista
+	centrales = {}												# Creo diccionario de conteo de apariciones
 	total = 0
-	for i in range(100):
-		print("Ejecucion {}".format(i))
-		v_inicial = random.choice(vertices)
-		similares = obtener_lista_semejantes(grafo, v_inicial)
-		
-		for similar in similares:
-			#print(similar[1])
-			if similar[1] not in centrales:
-				centrales[similar[1]] = 1
-			else:
-				centrales[similar[1]] += 1
-	heap = []
-	#Ingreso todos los valores en Heap
-	for vertice in centrales:
-		tupla = (centrales[vertice], vertice)
-		heappush(heap, tupla)
-		total += 1
 
-	listaord = []
-	#Heapsort
+	for i in range(100):										# Iteraciones suficientes para determinar centralidad. 
+		v_inicial = random.choice(vertices)						# Elijo un vertice aleatorio
+		temp = random_walks(grafo, v_inicial, 200000, 1)		# Hago caminata random de una porcion significativa del grafo
+		caminata = temp[0]										# Guardo lista de vertices obtenida
+
+		
+		for paso in caminata:
+			if paso not in centrales:
+				centrales[paso] = 1
+			else:
+				centrales[paso] += 1
+	heap = []
+	for vertice in centrales:									# Ingreso todos los valores en Heap
+		tupla = (centrales[vertice], vertice)					# Armo tupla con cantidad de ocurrencias de vertice y vertice
+		heappush(heap, tupla)									# Guardo en heap
+		total += 1												# Cuento total de operaciones
+
+	listaord = []												# Heapsort
 	for i in range(total):
-		listaord.append(heappop(heap))
-	listafin = []
+		listaord.append(heappop(heap))							# Genero lista de tuplas ordenadas segun ocurrencias de vertices
+	
+	listafin = []												# Lista para guardar solo los n usuarios centrales solicitados
 	print("Usuarios centrales: ", end='')
-	for usuario in range(n):
+	
+	for usuario in range(n):									# Armado de la lista con n usuarios centrales
 		tupla = listaord.pop()
 		listafin.append(tupla[1])
-	charf = ", ".join(listafin)
+
+	listafin.sort()												# Sorts de acuerdo a la consiga
+	listafin.sort(key=len)
+	charf = ", ".join(listafin)									# Print final
 	print(charf)

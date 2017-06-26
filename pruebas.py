@@ -71,7 +71,7 @@ def pruebas():
 
 	print("Prueba de centralidad")
 	time_inicial = time()
-	centralidad(grafo, 10)
+	centralidad(grafo, 20)
 	time_final = time()
 	time_execution = time_final - time_inicial
 	print("Tiempo de Ejecucion de Centralidad: {}\n".format(time_execution))
