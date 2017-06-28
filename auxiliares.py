@@ -1,6 +1,6 @@
 
 import random
-from heapq import heappush, heappop
+import heapq
 import queue
 
 
@@ -173,32 +173,30 @@ def contactos_conexion(grafo, args):
 	else: print("Imposible Conectar Ambos Usuarios") #Caso sin Conexion		
 
 
-def obtener_lista_semejantes(grafo, userid):
-	lista_walks = random_walks(grafo, userid, 20000, 100)
-	diccionario = {}
-	total = 0
-	#Realizo el conteo de apariciones totales por usuario (utilizo diccionario)
-	for caminos in lista_walks:
-		for vertice in caminos:
-			if vertice in diccionario:
-				diccionario[vertice] +=1
-			else:
-				diccionario[vertice] = 1
-				total +=1
-	heap = []
-	#Ingreso todos los valores en Heap
-	for user in diccionario:
-		tupla = (diccionario[user], user)
-		heappush(heap, tupla)
-
-	listaord = []
-	#Heapsort
-	for i in range(total):
-		listaord.append(heappop(heap))
-
-	#Quito al mismo usuario del resultado
-	listaord.pop()
-	return listaord
+def get_lista_similares(grafo, userid, cantsimil):
+	lista_walks = random_walks(grafo, userid, 10000, 100)
+	
+	dicc = {}
+	for walk in lista_walks:
+		for vertice in walk:
+			if vertice in dicc: dicc[vertice] += 1
+			else: dicc[vertice] = 1
+	dicc.pop(userid)
+	
+	lista_inicial = []
+	for user in dicc:
+		lista_inicial.append((dicc[user], user))
+	
+	lista_total = []
+	if cantsimil != 0: 
+		lista_total = heapq.nlargest(cantsimil, lista_inicial)
+	else: 
+		lista_total = heapq.nlargest(len(lista_inicial), lista_inicial)
+	
+	lista_final = []
+	for i in range(len(lista_total)):
+		lista_final.append(lista_total[i][1])
+	return lista_final
 
 
 def similares(grafo, args):
@@ -220,11 +218,7 @@ def similares(grafo, args):
 		print("Error. '{}' no es un número entero".format(args[2]))
 		return
 
-	listaord = obtener_lista_semejantes(grafo, userid)
-	listafin = []
-	for i in range(cantsimil):
-		tupla = (listaord.pop())
-		listafin.append(tupla[1])
+	listafin = get_lista_similares(grafo, userid, cantsimil)
 	charf = ", ".join(listafin)
 	print(charf)
 
@@ -245,16 +239,13 @@ def recomendar(grafo, args):
 	except ValueError:
 		print("Error. '{}' no es un número entero".format(args[2]))
 		return
-
-	listaord = obtener_lista_semejantes(grafo, userid)
-	total = len(listaord)
+		
+	listaord = get_lista_similares(grafo, userid, 0)
 	listafin = []
-	for i in range(total):
-		tupla = listaord.pop()
-		if not grafo.son_adyacentes(userid, tupla[1]):
-			listafin.append(tupla[1])
-			if len(listafin) == cantrecom:
-				break
+	for i in range(len(listaord)):
+		if not grafo.son_adyacentes(userid, listaord[i]):
+			listafin.append(listaord[i])
+			if len(listafin) == cantrecom: break
 	charf = ", ".join(listafin)
 	print(charf)
 
