@@ -1,16 +1,17 @@
-
+import os
 import random
 import heapq
 import queue
 
 
 def cargar_grafo(grafo, archivo):
-	print("Cargando archivo {}...".format(archivo))
-	print("Aguarde unos instantes...")
+	print("Cargando archivo < {} >... Aguarde unos instantes...\n".format(archivo))
+	if not os.path.isfile(archivo):
+		print("Oops. Archivo Inexistente o Invalido: < {} >.".format(archivo))
+		raise IOError
 	try:
 		file = open(archivo, 'r')
 	except IOError:
-		print("Oops! Parece que {} no es un archivo existente. Abortando...".format(archivo))
 		raise IOError
 
 	linea = file.readline()
@@ -19,11 +20,11 @@ def cargar_grafo(grafo, archivo):
 	while (linea != ''):
 		if not (linea[0] == '#'):
 			lista = linea.split("\t")
-			verticeant = lista[0]
-			grafo.add_vertice(verticeant)
-			while (linea != '') and (verticeant == lista[0]):
+			v_actual = lista[0]
+			grafo.add_vertice(v_actual)
+			while (linea != '') and (v_actual == lista[0]):
 				grafo.add_vertice(lista[1])
-				grafo.add_arista(verticeant, lista[1])
+				grafo.add_arista(v_actual, lista[1])
 				linea = file.readline()
 				linea = linea.rstrip("\n")
 				lista = linea.split("\t")
@@ -31,7 +32,7 @@ def cargar_grafo(grafo, archivo):
 			linea = file.readline()
 			linea = linea.rstrip("\n")
 	file.close()
-	print("\nArchivo cargado con exito!")
+	print("Archivo cargado con exito!\n")
 
 
 def random_walks(grafo, v_inicial, lenght_walk, total_walk):
@@ -63,11 +64,11 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 
 
 def grafo_stats(grafo, args):
-
-
-	if len(args) != 1:
-		print("Error. El comando no admite argumentos")
-		return
+	NUM_ARGUM = 1
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'estadisticas' no admite argumento.")
+		print("Mas informacion sobre el comando 'estadisticas' utilice el comando 'ayuda'")
+		raise Exception
 
 	print("-----------Datos Estadisticos del Grafo------------")
 	vertices = grafo.total_vertices()
@@ -100,15 +101,17 @@ def bfs_conexion(grafo, origen, visitados, antecesores, orden, destino):
 
 def distancia_stats(grafo, args):
 
-	if len(args) != 2:
-		print("Error. El comando admite solo 1 argumento")
-		return
+	NUM_ARGUM = 2
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'distancias' admite y requiere un unico argumento")
+		print("Mas informacion sobre el comando 'distancia' utilice el comando 'ayuda'")
+		raise Exception
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
 		return
+	
 	userid = args[1]
-
 	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
 	visitados = {}
 	antecesores = {}
@@ -134,21 +137,21 @@ def distancia_stats(grafo, args):
 
 def contactos_conexion(grafo, args):
 	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
+	NUM_ARGUM = 3
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'camino' admite solamente 2 argumentos")
+		print("Mas informacion sobre el comando 'camino' utilice el comando 'ayuda'")
+		raise Exception
 
-	if len(args) != 3:
-		print("Error. El comando admite solo 2 argumentos")
+	if not grafo.vertice_exist(args[1]) or not grafo.vertice_exist(args[2]):
+		if not grafo.vertice_exist(args[1]):
+			print("Error. El usuario {} es inexistente en la red.".format(args[1]))
+		if not grafo.vertice_exist(args[2]):
+			print("Error. El usuario {} es inexistente en la red.".format(args[2]))
 		return
 
-	if not grafo.vertice_exist(args[1]):
-		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
-		return
 	id_origen = args[1]
-
-	if not grafo.vertice_exist(args[2]):
-		print("Error. El usuario {} es inexistente en la red.".format(args[2]))
-		return
 	id_destino = args[2]
-
 	visitados = {}
 	antecesores = {}
 	orden = {}
@@ -203,20 +206,27 @@ def similares(grafo, args):
 	"""Calcula la cantidad 'cantsimil' de usuarios semejantes a 'userid', 
 	   Siendo los usuarios similares aquellos que aparecen mas veces en
 	   los sucesivos caminos aleatorios."""	
-	if len(args) != 3:
-		print("Error. El comando admite solo 2 argumentos")
-		return
+	NUM_ARGUM = 3   
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'similares' admite solamente 2 argumentos")
+		print("Mas informacion sobre el comando 'similares' utilice el comando 'ayuda'")
+		raise Exception
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
 		return
+
 	userid = args[1]
 
 	try:
 		cantsimil = int(args[2])
 	except ValueError:
 		print("Error. '{}' no es un número entero".format(args[2]))
-		return
+		raise Exception
+
+	if (cantsimil <= 0):
+		print("Error. La cantidad de usuarios similares a informar debe ser mayor a 0")
+		raise Exception
 
 	listafin = get_lista_similares(grafo, userid, cantsimil)
 	charf = ", ".join(listafin)
@@ -224,21 +234,27 @@ def similares(grafo, args):
 
 
 def recomendar(grafo, args):
-
-	if len(args) != 3:
-		print("Error. El comando admite solo 2 argumentos")
-		return
+	NUM_ARGUM = 3
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'recomendar' admite solamente 2 argumentos")
+		print("Mas informacion sobre el comando 'recomendar' utilice el comando 'ayuda'")
+		raise Exception
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
 		return
+
 	userid = args[1]
 
 	try:
 		cantrecom = int(args[2])
 	except ValueError:
 		print("Error. '{}' no es un número entero".format(args[2]))
-		return
+		raise Exception
+
+	if (cantrecom <= 0):
+		print("Error. La cantidad de usuarios a recomendar debe ser mayor a 0")
+		raise Exception	
 		
 	listaord = get_lista_similares(grafo, userid, 0)
 	listafin = []
@@ -248,6 +264,8 @@ def recomendar(grafo, args):
 			if len(listafin) == cantrecom: break
 	charf = ", ".join(listafin)
 	print(charf)
+
+
 
 def max_freq(grafo, comunidades, vertice):
 	adyacentes = grafo.get_adyacentes(vertice)				# Obtengo lista de adyacentes de vertice actual
@@ -267,10 +285,11 @@ def max_freq(grafo, comunidades, vertice):
 
 
 def comunidades(grafo, args):
-
-	if len(args) != 1:
-		print("Error. El comando no admite argumentos")
-		return
+	NUM_ARGUM = 1
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'comunidades' no admite argumentos")
+		print("Mas informacion sobre el comando 'comunidades' utilice el comando 'ayuda'")
+		raise Exception
 
 	comunidades = {}
 	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
@@ -303,16 +322,21 @@ def comunidades(grafo, args):
 
 			
 def centralidad(grafo, args):
-
-	if len(args) != 2:
-		print("Error. El comando admite solo 1 argumento")
-		return
+	NUM_ARGUM = 2
+	if (len(args) != NUM_ARGUM):
+		print("Error. El comando 'centralidad' admite solamente 1 argumento")
+		print("Mas informacion sobre el comando 'centralidad' utilice el comando 'ayuda'")
+		raise Exception
 
 	try:
-		n = int(args[1])
+		cantctral = int(args[1])
 	except ValueError:
 		print("Error. '{}' no es un número entero".format(args[1]))
-		return
+		raise Exception
+
+	if (cantctral <= 0):
+		print("Error. La cantidad de usuarios centrales a informar debe ser mayor a 0")	
+		raise Exception
 
 	vertices = grafo.get_vertices()								# Obtengo todos los vertices del grafo en una lista
 	centrales = {}												# Creo diccionario de conteo de apariciones
@@ -342,7 +366,7 @@ def centralidad(grafo, args):
 	listafin = []												# Lista para guardar solo los n usuarios centrales solicitados
 	print("Usuarios centrales: ", end='')
 	
-	for usuario in range(n):									# Armado de la lista con n usuarios centrales
+	for usuario in range(cantctral):									# Armado de la lista con n usuarios centrales
 		tupla = listaord.pop()
 		listafin.append(tupla[1])
 
@@ -351,92 +375,126 @@ def centralidad(grafo, args):
 	charf = ", ".join(listafin)									# Print final
 	print(charf)
 
-def ayuda(grafo, args):
-	print("Ayuda de programa TP3 - Grafos en YouTube")
-	print("")
-	print("Comandos disponibles:")
 
-	print("Similares: dado un usuario, encontrar los personajes más similares a este.")
-	print("\tParámetros:")
-	print("\t\tid: el id del usuario.")
-	print("\t\tn: la cantidad de usuarios semejantes que se desea buscar.")
-	print("\tSalida: los n usuarios más similares al indicado, ordenados de mayor a menor similaridad.")
-	print("\tEjemplo:")
-	print("\t\t> similares 1 5")
-	print("\t\t> 20 22 21583 1219 3")
-	print("")
+def ayuda_specific(menu, args):
+	NUM_ARGUM = 2
+	if (len(args) != 2 or args[1] not in menu):
+		print("Comando Desconocido. Ayuda Imposible de Realizar...")
+		raise Exception
+	if (args[1] == "similares"):
+		print("Similares: busca los usuarios más similares al usuario indicado.")
+		print("\tParámetros Necesarios:")
+		print("\t\tid: el id del usuario.")
+		print("\t\tn: la cantidad de usuarios similares a listar.")
+		print("\tSalida: un listado de n usuarios más similares al indicado, ordenados de mayor a menor similaridad.")
+		print("\tEjemplo:")
+		print("\t\t> similares 1 6")
+		print("\t\t> 11 23 21338 1219 786")
+		print("")
+		return 
+	if (args[1] == "recomendar"):
+		print("Recomendar: recomienda usuario/s similar/es al usuario indicado, con el/los cual/es aún no tenga relación.")
+		print("\tParámetros Necesarios:")
+		print("\t\tid: el id del usuario indicado.")
+		print("\t\tn: la cantidad de usuarios similares a recomendar.")
+		print("\tSalida: un listado con los n usuarios más similares al indicado, ordenados de mayor a menor similaridad.")
+		print("\tEjemplo:")
+		print("\t\t> recomendar 3 8")
+		print("\t\t> 1072, 883, 29663, 29686, 769, 2392, 80, 100")
+		print("")
+		return 
+	if (args[1] == "camino"):
+		print("Camino: informa un trayecto minimo tal que un comunicado llegue lo más rápido posible de un usuario A a un usuario B (a traves de contactos directos).")
+		print("\tParámetros Necesarios:")
+		print("\t\tid1: el id del usuario de partida.")
+		print("\t\tid2: el id del usuario de llegada.")
+		print("\tSalida: camino minimo desde el usuario con id1 al usuario con id2 en caso de existir uno.")
+		print("\tEjemplo:")
+		print("\t\t> camino 11 1991")
+		print("\t\t> 11 -> 663535 -> 106 -> 1991")
+		print("")
+		return
+	if (args[1] == "centralidad"):
+		print("Centralidad (o Betweeness): informa un listado con una cantidad dada de los usuarios más centrales, importantes e influyentes en la red social.")
+		print("\tParámetros Necesarios:")
+		print("\t\tn: la cantidad de usuarios centrales a mostrar.")
+		print("\tSalida: los n usuarios más centrales de la red, ordenados de mayor a menor centralidad.")
+		print("\tEjemplo:")
+		print("\t\t> centralidad 3")
+		print("\t\t> 83 663869 832")
+		print("")	
+		return
+	if (args[1] == "distancias"):
+		print("Distancias: dado un usuario, informa la cantidad de usuarios que se encuentran a cada una de las distancias posibles.")
+		print("\tParámetro Necesario:")
+		print("\t\tid: el id del usuario al cual se desea obtener las distancias.")
+		print("\tSalida:")
+		print("\t\tDistancia 1: cantidad de usuarios adyacentes al usuario en cuestión.")
+		print("\t\tDistancia 2: cantidad de usuarios a distancia 2 del usuario en cuestión.")
+		print("\t\tetc.")
+		print("\tEjemplo:")
+		print("\t\t> distancias 9")
+		print("\t\t> Distancia 1: 1")
+		print("\t\t> Distancia 2: 28")
+		print("\t\t> Distancia 3: 7147")
+		print("\t\t> etc.")
+		print("")
+		return
+	if (args[1] == "estadisticas"):
+		print("Estadísticas: informa determinados estadísticos relevantes sobre las uniones del grafo de la red social.")
+		print("\tParámetro: (ninguno)")
+		print("\tEjemplo de Salida: ")
+		print("\t\t> estadisticas")
+		print("\t\t> Cantidad de vértices: 12")
+		print("\t\t> Cantidad de aristas: 144")
+		print("\t\t> Promedio de grado de entrada de cada vértice: 11")
+		print("\t\t> Promedio de grado de salida de cada vértice: 11")
+		print("\t\t> Densidad del grafo: 1")
+		print("")
+		return
+	if (args[1] == "comunidades"):
+		print("Comunidades: informa las distintas comunidades existentes en la red social.")
+		print("\tParámetros: (ninguno)")
+		print("\tSalida: Por cada comunidad, la cantidad de integrantes, y un listado con los integrantes.")
+		print("\tEjemplo:")
+		print("\t\t> comunidades")
+		print("\t\t> Comunidad 386613 tiene 6 integrantes.")
+		print("\t\t  Integrantes: ['880540', '573868', '573867', '621437', '621436', '386613']")
+		print("\t\t> Comunidad 76283 tiene 8 integrantes")
+		print("\t\t  Integrantes: ['761998', '761997', '761995', '761996', '761999', '370028', '76283', '370027']")
+		print("\t\t> etc.")
+		print("")
+		return
+	if (args[1] == "ayuda"):
+		print("Ayuda: informa las caracteristicas especificas de un comando disponible del Programa")
+		print("\tParametro: comando al cual se desea obtener la ayuda")
+		print("\tSalida: los detalles del funcionamiento del comando indicado")
+		print("\tEjemplo:")
+		print("\t\t> ayuda comando")
+		print("")
+		return	
+	if (args[1] == "?"):
+		print("Acceso al Manual con la informacion detallada y especifica de todos los comandos disponibles del Programa")
+		print("\tParametros: (ninguno)")
+		print("\tEjemplo:")
+		print("\t\t> ?")
+		print("")
+		return	
+	if (args[1] == "exit"):
+		print("Exit (Salir de la Ejecucion del Programa): Finaliza la Ejecucion del Programa")
+		print("\tParámetros: (ninguno)")
+		print("\tEjemplo:")
+		print("\t\t> exit")
+		print("")
+		return
 
-	print("Recomendar: dado un usuario, recomendar otro (u otros) usuario con el cual aún no tenga relación, y sea lo más similar a él posible.")
-	print("\tParámetros:")
-	print("\t\tid: el id del usuario en cuestión.")
-	print("\t\tn: la cantidad de usuarios a recomendar.")
-	print("\tSalida: los n usuarios más similares al indicado, ordenados de mayor a menor similaridad.")
-	print("\tEjemplo:")
-	print("\t\t> recomendar 5 4")
-	print("\t\t> 1072, 884, 29664, 29686")
-	print("")
+		
 
-	print("Camino: queremos que un comunicado llegue lo más rápido posible de un usuario A a un usuario B. Sabemos que un usuario puede comunicar su mensaje solo a sus contactos directos, por lo que la mejor estrategia será pasar por la menor cantidad de usuarios posibles. Tener presente que es posible que el grafo tenga más de una componente conexa, por lo que pueden haber vértices entre los cuales no exista camino posible.")
-	print("\tParámetros:")
-	print("\t\tid1: el id del usuario de partida.")
-	print("\t\tid2: el id del usuario de llegada.")
-	print("\tSalida: camino más corto para llegar desde el usuario con id1 al usuario con id2.")
-	print("\tEjemplo:")
-	print("\t\t> camino 11 1991")
-	print("\t\t> 11 -> 663545 -> 106 -> 1991")
-	print("")
-
-	print("Centralidad (o Betweeness): permite obtener los usuarios más centrales de la red. Los usuarios más centrales suelen ser a su vez los más importantes (o como se denomina en redes sociales, influyente).")
-	print("\tParámetros:")
-	print("\t\tn: la cantidad de usuarios que se desean mostrar.")
-	print("\tSalida: los n usuarios más centrales de la red, ordenados de mayor a menor.")
-	print("\tEjemplo:")
-	print("\t\t> centralidad 3")
-	print("\t\t> 83 663545 832")
-	print("")
-
-	print("Distancias: dado un usuario, obtener la cantidad de personajes que se encuentran a cada una de las distancias posibles, considerando las distancias como la cantidad de saltos.")
-	print("\tParámetro:")
-	print("\t\tid: el id del usuario al cuál se le desean obtener las distancias.")
-	print("\tSalida:")
-	print("\t\tDistancia 1: cantidad de usuarios adyacentes al usuario en cuestión.")
-	print("\t\tDistancia 2: cantidad de usuarios a distancia 2 del usuario en cuestión.")
-	print("\t\tetc.")
-	print("\tEjemplo:")
-	print("\t\t> distancias 9")
-	print("\t\t> Distancia 1: 1")
-	print("\t\t> Distancia 2: 28")
-	print("\t\t> Distancia 3: 7147")
-	print("\t\tetc.")
-	print("")
-
-	print("Estadísticas: muchas veces es de interés obtener ciertas estadísticas sobre las uniones del grafo. Nos interesa que nos muestre el total de vértices, el total de aristas, el promedio del grado de cada vértice y la densidad del grafo (la proporción entre la cantidad de aristas, y la cantidad de aristas máximas que puede llegar tener el grafo, con esa cantidad de vértices).")
-	print("\tParámetros: (ninguno)")
-	print("\tSalida:")
-	print("\t\tCantidad de vértices.")
-	print("\t\tCantidad de aristas.")
-	print("\t\tPromedio del grado de entrada cada vértice.")
-	print("\t\tPromedio del grado de salida cada vértice.")
-	print("\t\tDensidad del grafo.")
-	print("")
-	print("Comunidades: nos permite mostrar las comunidades que se encuentren en la red. Recomendamos utilizar el algoritmo de Label Propagation descrito en la introducción de este trabajo práctico.")
-	print("\tParámetros: (ninguno)")
-	print("\tSalida: Por cada comunidad, la cantidad de integrantes, y un listado con los integrantes.")
-	print("\tEjemplo:")
-	print("\t\t> estadisticas")
-	print("\t\t> Cantidad de vértices: 12")
-	print("\t\t> Cantidad de aristas: 144")
-	print("\t\t> Promedio de grado de entrada de cada vértice: 11")
-	print("\t\t> Promedio de grado de salida de cada vértice: 11")
-	print("\t\t> Densidad del grafo: 1")
-	print("")
-
-	print("Exit (salir del programa): Sale del programa")
-	print("\tParámetros: (ninguno)")
-	print("\tEjemplo:")
-	print("\t\t> exit")
-
-
-
-
-
+def ayuda_general(menu, args):
+	print("**********Ayuda de Programa TP3 - Grafos en YouTube***********\n")
+	print("--------Listado de los Comandos Disponibles--------\n") 
+	args.append("option")
+	for option in menu:
+		args[1] = option
+		ayuda_specific(menu, args)
+		
