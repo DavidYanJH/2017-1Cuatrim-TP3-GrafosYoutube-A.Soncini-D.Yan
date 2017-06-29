@@ -1,7 +1,9 @@
 import os
 import random
+from heapq import *
 import heapq
 import queue
+from time import time
 
 
 def cargar_grafo(grafo, archivo):
@@ -294,14 +296,11 @@ def comunidades(grafo, args):
 	comunidades = {}
 	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
 	random.shuffle(vertices)				# Rerodeno aleatoriamente
-	
 	for vertice in vertices:				# Por cada vertice del grafo...
 		comunidades[vertice] = vertice 		# Cada vertice lleva inicialmente su propia label de comunidad.
-
 	for i in range(20):						# Ciclos de iteracion, que dan la condicion de corte
 		for vertice in vertices:				# Por cada vertice del grafo...
 			comunidades[vertice] = max_freq(grafo, comunidades, vertice)			# Cambio label segun maxima frecuencia de labels en adyacentes
-	
 	aux = {}													# Creo diccionario de comunidades y miembros
 	cant_comunidades = 0										# Contador de cantidad de comunidades
 	for vertice in vertices:									# Por cada vertice del grafo original...
@@ -318,7 +317,10 @@ def comunidades(grafo, args):
 		cantidad_comunidad = len(aux[comunidad])
 		if ((cantidad_comunidad > 5) and (cantidad_comunidad < 2000)):
 			print("Comunidad {} tiene {} integrantes".format(comunidad, cantidad_comunidad))
-			print("Integrantes: {}".format(aux[comunidad]))
+			print("Integrantes: ", end='')
+			charf = ", ".join(aux[comunidad])									# Print final
+			print(charf)
+			print("")
 
 			
 def centralidad(grafo, args):
@@ -346,7 +348,6 @@ def centralidad(grafo, args):
 		v_inicial = random.choice(vertices)						# Elijo un vertice aleatorio
 		temp = random_walks(grafo, v_inicial, 200000, 1)		# Hago caminata random de una porcion significativa del grafo
 		caminata = temp[0]										# Guardo lista de vertices obtenida
-
 		
 		for paso in caminata:
 			if paso not in centrales:
@@ -359,22 +360,15 @@ def centralidad(grafo, args):
 		heappush(heap, tupla)									# Guardo en heap
 		total += 1												# Cuento total de operaciones
 
-	listaord = []												# Heapsort
-	for i in range(total):
-		listaord.append(heappop(heap))							# Genero lista de tuplas ordenadas segun ocurrencias de vertices
-	
-	listafin = []												# Lista para guardar solo los n usuarios centrales solicitados
-	print("Usuarios centrales: ", end='')
-	
+	listatemp = heapq.nlargest(cantctral, heap)
+	listafin = []
 	for usuario in range(cantctral):									# Armado de la lista con n usuarios centrales
-		tupla = listaord.pop()
-		listafin.append(tupla[1])
-
-	listafin.sort()												# Sorts de acuerdo a la consiga
+		listafin.append(listatemp[usuario][1])
+	listafin.sort()
 	listafin.sort(key=len)
 	charf = ", ".join(listafin)									# Print final
 	print(charf)
-
+	time_final = time()
 
 def ayuda_specific(menu, args):
 	NUM_ARGUM = 2
@@ -459,9 +453,9 @@ def ayuda_specific(menu, args):
 		print("\tEjemplo:")
 		print("\t\t> comunidades")
 		print("\t\t> Comunidad 386613 tiene 6 integrantes.")
-		print("\t\t  Integrantes: ['880540', '573868', '573867', '621437', '621436', '386613']")
+		print("\t\t  Integrantes: 880540, 573868, 573867, 621437, 621436, 386613")
 		print("\t\t> Comunidad 76283 tiene 8 integrantes")
-		print("\t\t  Integrantes: ['761998', '761997', '761995', '761996', '761999', '370028', '76283', '370027']")
+		print("\t\t  Integrantes: 761998, 761997, 761995, 761996, 761999, 370028, 76283, 370027")
 		print("\t\t> etc.")
 		print("")
 		return

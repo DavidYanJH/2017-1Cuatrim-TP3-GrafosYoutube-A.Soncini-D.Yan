@@ -33,7 +33,7 @@ class Grafo:
 		
 	def get_vertices(self):
 		"""Retorna una lista desordenada de todos los vertices del grafo"""
-		return self.grafo.keys()
+		return list(self.grafo.keys())
 
 
 	def add_arista(self, verticeA, verticeB):
