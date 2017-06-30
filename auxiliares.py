@@ -1,9 +1,7 @@
 import os
 import random
-from heapq import *
 import heapq
 import queue
-from time import time
 
 
 def cargar_grafo(grafo, archivo):
@@ -20,7 +18,7 @@ def cargar_grafo(grafo, archivo):
 	linea = linea.rstrip("\n")
 
 	while (linea != ''):
-		if not (linea[0] == '#'):
+		if not (linea[0] == '#'): # IGNORAR LAS LINEAS DE COMENTARIO
 			lista = linea.split("\t")
 			v_actual = lista[0]
 			grafo.add_vertice(v_actual)
@@ -35,6 +33,7 @@ def cargar_grafo(grafo, archivo):
 			linea = linea.rstrip("\n")
 	file.close()
 	print("Archivo cargado con exito!\n")
+
 
 
 def random_walks(grafo, v_inicial, lenght_walk, total_walk):
@@ -65,24 +64,31 @@ def random_walks(grafo, v_inicial, lenght_walk, total_walk):
 	return lista_walks
 
 
-def grafo_stats(grafo, args):
-	NUM_ARGUM = 1
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'estadisticas' no admite argumento.")
-		print("Mas informacion sobre el comando 'estadisticas' utilice el comando 'ayuda'")
-		return
 
-	print("-----------Datos Estadisticos del Grafo------------")
-	vertices = grafo.total_vertices()
-	aristas = grafo.total_aristas()
-	print("Cantidad de Vertices del Grafo: {}".format(vertices))
-	print("Cantidad de Aristas del Grafo: {}".format(aristas))
-	grado_promedio = aristas / vertices
-	print("Promedio de Grado de Entrada de cada Vertice: {:.2f}".format(grado_promedio))
-	print("Promedio de Grado de Salida de cada Vertice: {:.2f}".format(grado_promedio))
-	max_arista = vertices * (vertices - 1) / 2
-	densidad_relat = aristas / max_arista
-	print("Densidad Relativa del Grafo: {:.2f}".format(densidad_relat))
+def get_lista_similares(grafo, userid, cantsimil):
+	lista_walks = random_walks(grafo, userid, 10000, 100)
+	
+	dicc = {}
+	for walk in lista_walks:
+		for vertice in walk:
+			if vertice in dicc: dicc[vertice] += 1
+			else: dicc[vertice] = 1
+	dicc.pop(userid)
+	
+	lista_inicial = []
+	for user in dicc:
+		lista_inicial.append((dicc[user], user))
+	
+	lista_total = []
+	if cantsimil != 0: 
+		lista_total = heapq.nlargest(cantsimil, lista_inicial) # HEAP DE MAXIMO TOP K = CANTSIMIL
+	else: 
+		lista_total = heapq.nlargest(len(lista_inicial), lista_inicial) # HEAPSORT DE MAXIMO
+	
+	lista_final = []
+	for i in range(len(lista_total)):
+		lista_final.append(lista_total[i][1])
+	return lista_final
 
 
 
@@ -101,171 +107,30 @@ def bfs_conexion(grafo, origen, visitados, antecesores, orden, destino):
 				if destino in visitados: return #Condicion de Corte en Caso Necesario
 
 
-def distancia_stats(grafo, args):
 
-	NUM_ARGUM = 2
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'distancias' admite y requiere un unico argumento")
-		print("Mas informacion sobre el comando 'distancia' utilice el comando 'ayuda'")
-		return
+def get_lista_centrales(grafo, cantctral):
+	vertices = grafo.get_vertices()								# Obtengo todos los vertices del grafo en una lista
+	centrales = {}												# Creo diccionario de conteo de apariciones
 
-	if not grafo.vertice_exist(args[1]):
-		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
-		return
-	
-	userid = args[1]
-	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
-	visitados = {}
-	antecesores = {}
-	orden = {}
-	antecesores[userid] = None
-	orden[userid] = 0
-	#BFS con un determinado Vertice/Usuario del Grafo
-	bfs_conexion(grafo, userid, visitados, antecesores, orden, None)
-	#Consigo la Maxima Distancia al Vertice/Usuario Origen
-	max_distance = max(orden.values())
-	#Inicializacion de una Lista Auxiliar, cuya funcion consiste en contabilizar
-	#las cantidades de usuarios segun la distancia al Vertice/Usuario Origen 
-	distance = [] 
-	for i in range(max_distance + 1):
-		distance.append(0)
-	#Proceso de Contabilizar las cantidades de usuarios segun distancia al Origen
-	for v in visitados:
-		distance[orden[v]] += 1
-	#Mensajes de Salida Estandar
-	for i in range(1, max_distance + 1):
-		print("Distancia {}: {} usuarios".format(i, distance[i]))	
+	for i in range(100):										# Iteraciones suficientes para determinar centralidad. 
+		v_inicial = random.choice(vertices)						# Elijo un vertice aleatorio de partida
+		temp = random_walks(grafo, v_inicial, 200000, 1)		# Hago caminata random de una porcion significativa del grafo
+		caminata = temp[0]										# Guardo lista de vertices obtenida
+		for paso in caminata:
+			if paso not in centrales:
+				centrales[paso] = 1
+			else:
+				centrales[paso] += 1
 
+	lista = []
+	for vertice in centrales:								
+		lista.append((centrales[vertice], vertice))
 
-def contactos_conexion(grafo, args):
-	#Inicializacion de las Variables Fundamentales a Utilizar en BFS
-	NUM_ARGUM = 3
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'camino' admite solamente 2 argumentos")
-		print("Mas informacion sobre el comando 'camino' utilice el comando 'ayuda'")
-		return
-
-	if not grafo.vertice_exist(args[1]) or not grafo.vertice_exist(args[2]):
-		if not grafo.vertice_exist(args[1]):
-			print("Error. El usuario {} es inexistente en la red.".format(args[1]))
-		if not grafo.vertice_exist(args[2]):
-			print("Error. El usuario {} es inexistente en la red.".format(args[2]))
-		return
-
-	id_origen = args[1]
-	id_destino = args[2]
-	visitados = {}
-	antecesores = {}
-	orden = {}
-	antecesores[id_origen] = None
-	orden[id_origen] = 0
-	#BFS de Camino Minimo desde usuario id_origen hacia usuario id_destino
-	bfs_conexion(grafo, id_origen, visitados, antecesores, orden, id_destino)
-	#Verifico la Existencia de Camino o Conexion entre Ambos Usuarios
-	if id_destino in visitados:
-		#Reconstruyo el Camino Minimo Hallado usando una LIFO.Queue/Pila
-		p = queue.LifoQueue()
-		actual = id_destino
-		p.put(actual)
-		for i in range(orden[actual]):
-			actual = antecesores[actual]
-			p.put(actual)
-		#Doy Formato Necesario a la Salida	
-		while not p.empty():
-			actual = p.get()
-			if not p.empty(): print("{}".format(actual), end = " --> ")
-			else: print("{}\n".format(actual))
-	else: print("Imposible Conectar Ambos Usuarios") #Caso sin Conexion		
-
-
-def get_lista_similares(grafo, userid, cantsimil):
-	lista_walks = random_walks(grafo, userid, 10000, 100)
-	
-	dicc = {}
-	for walk in lista_walks:
-		for vertice in walk:
-			if vertice in dicc: dicc[vertice] += 1
-			else: dicc[vertice] = 1
-	dicc.pop(userid)
-	
-	lista_inicial = []
-	for user in dicc:
-		lista_inicial.append((dicc[user], user))
-	
-	lista_total = []
-	if cantsimil != 0: 
-		lista_total = heapq.nlargest(cantsimil, lista_inicial)
-	else: 
-		lista_total = heapq.nlargest(len(lista_inicial), lista_inicial)
-	
-	lista_final = []
-	for i in range(len(lista_total)):
-		lista_final.append(lista_total[i][1])
-	return lista_final
-
-
-def similares(grafo, args):
-	"""Calcula la cantidad 'cantsimil' de usuarios semejantes a 'userid', 
-	   Siendo los usuarios similares aquellos que aparecen mas veces en
-	   los sucesivos caminos aleatorios."""	
-	NUM_ARGUM = 3   
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'similares' admite solamente 2 argumentos")
-		print("Mas informacion sobre el comando 'similares' utilice el comando 'ayuda'")
-		return
-
-	if not grafo.vertice_exist(args[1]):
-		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
-		return
-
-	userid = args[1]
-
-	try:
-		cantsimil = int(args[2])
-	except ValueError:
-		print("Error. '{}' no es un número entero".format(args[2]))
-		raise Exception
-
-	if (cantsimil <= 0):
-		print("Error. La cantidad de usuarios similares a informar debe ser mayor a 0")
-		raise Exception
-
-	listafin = get_lista_similares(grafo, userid, cantsimil)
-	charf = ", ".join(listafin)
-	print(charf)
-
-
-def recomendar(grafo, args):
-	NUM_ARGUM = 3
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'recomendar' admite solamente 2 argumentos")
-		print("Mas informacion sobre el comando 'recomendar' utilice el comando 'ayuda'")
-		return
-
-	if not grafo.vertice_exist(args[1]):
-		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
-		return
-
-	userid = args[1]
-
-	try:
-		cantrecom = int(args[2])
-	except ValueError:
-		print("Error. '{}' no es un número entero".format(args[2]))
-		raise Exception
-
-	if (cantrecom <= 0):
-		print("Error. La cantidad de usuarios a recomendar debe ser mayor a 0")
-		raise Exception	
-		
-	listaord = get_lista_similares(grafo, userid, 0)
+	lista = heapq.nlargest(cantctral, lista)                    # Heap de TOP K
 	listafin = []
-	for i in range(len(listaord)):
-		if not grafo.son_adyacentes(userid, listaord[i]):
-			listafin.append(listaord[i])
-			if len(listafin) == cantrecom: break
-	charf = ", ".join(listafin)
-	print(charf)
+	for usuario in range(cantctral):							# Armado de la lista con n usuarios centrales
+		listafin.append(lista[usuario][1])
+	return listafin	
 
 
 
@@ -286,89 +151,6 @@ def max_freq(grafo, comunidades, vertice):
 	return comunidad_max									# Retorno comunidad de maxima frecuencia...
 
 
-def comunidades(grafo, args):
-	NUM_ARGUM = 1
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'comunidades' no admite argumentos")
-		print("Mas informacion sobre el comando 'comunidades' utilice el comando 'ayuda'")
-		return
-
-	comunidades = {}
-	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
-	random.shuffle(vertices)				# Rerodeno aleatoriamente
-	for vertice in vertices:				# Por cada vertice del grafo...
-		comunidades[vertice] = vertice 		# Cada vertice lleva inicialmente su propia label de comunidad.
-	for i in range(20):						# Ciclos de iteracion, que dan la condicion de corte
-		for vertice in vertices:				# Por cada vertice del grafo...
-			comunidades[vertice] = max_freq(grafo, comunidades, vertice)			# Cambio label segun maxima frecuencia de labels en adyacentes
-	aux = {}													# Creo diccionario de comunidades y miembros
-	cant_comunidades = 0										# Contador de cantidad de comunidades
-	for vertice in vertices:									# Por cada vertice del grafo original...
-		if comunidades[vertice] not in aux:						# Si la comunidad del vertice actual no existe en el diccionario final...
-			aux[comunidades[vertice]] = []						# Agrego nueva cmomunidad, con lista de miembros vacia
-			aux[comunidades[vertice]].append(vertice)			# Agrego primer miembro de la comunidad
-			cant_comunidades += 1								# Incremento contador de cantidad de comunidades
-		else:
-			aux[comunidades[vertice]].append(vertice)			# Si la cmunidad ya existe en diccionario final, agrego miembro
-	
-	print("Existen {} comunidades".format(cant_comunidades))	# Se imprime el total de comunidades
-	
-	for comunidad in aux:										# Se imprimen las comunidades y sus miembros, filtrando segun criterios de consigna
-		cantidad_comunidad = len(aux[comunidad])
-		if ((cantidad_comunidad > 5) and (cantidad_comunidad < 2000)):
-			print("Comunidad {} tiene {} integrantes".format(comunidad, cantidad_comunidad))
-			print("Integrantes: ", end='')
-			charf = ", ".join(aux[comunidad])									# Print final
-			print(charf)
-			print("")
-
-			
-def centralidad(grafo, args):
-	NUM_ARGUM = 2
-	if (len(args) != NUM_ARGUM):
-		print("Error. El comando 'centralidad' admite solamente 1 argumento")
-		print("Mas informacion sobre el comando 'centralidad' utilice el comando 'ayuda'")
-		return
-
-	try:
-		cantctral = int(args[1])
-	except ValueError:
-		print("Error. '{}' no es un número entero".format(args[1]))
-		raise Exception
-
-	if (cantctral <= 0):
-		print("Error. La cantidad de usuarios centrales a informar debe ser mayor a 0")	
-		raise Exception
-
-	vertices = grafo.get_vertices()								# Obtengo todos los vertices del grafo en una lista
-	centrales = {}												# Creo diccionario de conteo de apariciones
-	total = 0
-
-	for i in range(100):										# Iteraciones suficientes para determinar centralidad. 
-		v_inicial = random.choice(vertices)						# Elijo un vertice aleatorio
-		temp = random_walks(grafo, v_inicial, 200000, 1)		# Hago caminata random de una porcion significativa del grafo
-		caminata = temp[0]										# Guardo lista de vertices obtenida
-		
-		for paso in caminata:
-			if paso not in centrales:
-				centrales[paso] = 1
-			else:
-				centrales[paso] += 1
-	heap = []
-	for vertice in centrales:									# Ingreso todos los valores en Heap
-		tupla = (centrales[vertice], vertice)					# Armo tupla con cantidad de ocurrencias de vertice y vertice
-		heappush(heap, tupla)									# Guardo en heap
-		total += 1												# Cuento total de operaciones
-
-	listatemp = heapq.nlargest(cantctral, heap)
-	listafin = []
-	for usuario in range(cantctral):									# Armado de la lista con n usuarios centrales
-		listafin.append(listatemp[usuario][1])
-	listafin.sort()
-	listafin.sort(key=len)
-	charf = ", ".join(listafin)									# Print final
-	print(charf)
-	time_final = time()
 
 def ayuda_specific(menu, args):
 	NUM_ARGUM = 2
@@ -482,15 +264,19 @@ def ayuda_specific(menu, args):
 		print("")
 		return
 
+
 def ayuda_general(menu, args):
 	NUM_ARGUM = 1
 	if (len(args) != NUM_ARGUM):
-		print("Error. '?' no acepta argumentos")
+		print("Error. El comando '?' no admite argumentos")
 		return
-	print("**********Ayuda de Programa TP3 - Grafos en YouTube***********\n")
-	print("--------Listado de los Comandos Disponibles--------\n") 
+	print("\t\t************AYUDA DEL PROGRAMA TP3 - YOUTUBE EN GRAFO*************\n")
+	print("\t\t\t--------LISTADO DE LOS COMANDOS DISPONIBLES---------\n") 
 	args.append("option")
 	for option in menu:
 		args[1] = option
 		ayuda_specific(menu, args)
+
+
+
 		
