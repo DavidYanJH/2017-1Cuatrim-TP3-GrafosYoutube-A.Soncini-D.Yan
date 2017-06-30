@@ -9,7 +9,7 @@ from time import time
 def cargar_grafo(grafo, archivo):
 	print("Cargando archivo < {} >... Aguarde unos instantes...\n".format(archivo))
 	if not os.path.isfile(archivo):
-		print("Oops. Archivo Inexistente o Invalido: < {} >.".format(archivo))
+		print("Error al Abrir el Archivo < {} > con los Datos de la Red Social.\n".format(archivo))
 		raise IOError
 	try:
 		file = open(archivo, 'r')
@@ -70,7 +70,7 @@ def grafo_stats(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'estadisticas' no admite argumento.")
 		print("Mas informacion sobre el comando 'estadisticas' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	print("-----------Datos Estadisticos del Grafo------------")
 	vertices = grafo.total_vertices()
@@ -107,7 +107,7 @@ def distancia_stats(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'distancias' admite y requiere un unico argumento")
 		print("Mas informacion sobre el comando 'distancia' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
@@ -143,7 +143,7 @@ def contactos_conexion(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'camino' admite solamente 2 argumentos")
 		print("Mas informacion sobre el comando 'camino' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	if not grafo.vertice_exist(args[1]) or not grafo.vertice_exist(args[2]):
 		if not grafo.vertice_exist(args[1]):
@@ -212,7 +212,7 @@ def similares(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'similares' admite solamente 2 argumentos")
 		print("Mas informacion sobre el comando 'similares' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
@@ -240,7 +240,7 @@ def recomendar(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'recomendar' admite solamente 2 argumentos")
 		print("Mas informacion sobre el comando 'recomendar' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	if not grafo.vertice_exist(args[1]):
 		print("Error. El usuario {} es inexistente en la red.".format(args[1]))
@@ -291,7 +291,7 @@ def comunidades(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'comunidades' no admite argumentos")
 		print("Mas informacion sobre el comando 'comunidades' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	comunidades = {}
 	vertices = grafo.get_vertices()			# Obtengo todos los vertices del grafo en una lista
@@ -328,7 +328,7 @@ def centralidad(grafo, args):
 	if (len(args) != NUM_ARGUM):
 		print("Error. El comando 'centralidad' admite solamente 1 argumento")
 		print("Mas informacion sobre el comando 'centralidad' utilice el comando 'ayuda'")
-		raise Exception
+		return
 
 	try:
 		cantctral = int(args[1])
@@ -373,8 +373,8 @@ def centralidad(grafo, args):
 def ayuda_specific(menu, args):
 	NUM_ARGUM = 2
 	if (len(args) != 2 or args[1] not in menu):
-		print("Comando Desconocido. Ayuda Imposible de Realizar...")
-		raise Exception
+		print("Argumento desconocido. Ayuda Imposible de Realizar...")
+		return
 	if (args[1] == "similares"):
 		print("Similares: busca los usuarios más similares al usuario indicado.")
 		print("\tParámetros Necesarios:")
@@ -482,9 +482,11 @@ def ayuda_specific(menu, args):
 		print("")
 		return
 
-		
-
 def ayuda_general(menu, args):
+	NUM_ARGUM = 1
+	if (len(args) != NUM_ARGUM):
+		print("Error. '?' no acepta argumentos")
+		return
 	print("**********Ayuda de Programa TP3 - Grafos en YouTube***********\n")
 	print("--------Listado de los Comandos Disponibles--------\n") 
 	args.append("option")

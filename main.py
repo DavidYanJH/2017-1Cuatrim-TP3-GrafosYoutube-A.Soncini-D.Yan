@@ -32,7 +32,6 @@ def main():
 	try:
 		cargar_grafo(grafo, sys.argv[1])
 	except IOError:
-		print("Error al Abrir el Archivo < {} > con los Datos de la Red Social.\n".format(sys.argv[1]))
 		return 0
 	display_menu(grafo)
 
