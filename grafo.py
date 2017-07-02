@@ -61,7 +61,9 @@ class Grafo:
 
 
 	def son_adyacentes(self, verticeA, verticeB):
-		return verticeB in self.get_adyacentes(verticeA)
+		if self.vertice_exist(verticeA) and self.vertice_exist(verticeB):
+			return verticeB in self.get_adyacentes(verticeA)
+		return False
 
 	
 	def total_vertices(self):
