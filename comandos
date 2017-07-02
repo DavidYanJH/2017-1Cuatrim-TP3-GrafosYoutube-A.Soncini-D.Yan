@@ -1,19 +1,71 @@
 ?
-comunidades
-estadisticas
-distancias 9
-distancias 4
-distancias 999
-distancias 1837
-centralidad 4
+ayuda similares
+similares 1 8
+similares 6 7
+ayuda recomendar
+recomendar 9 9
+recomendar 36 6
+ayuda camino
+camino 1 1996
+camino 13 13
+ayuda centralidad
+centralidad 12
 centralidad 10
-centralidad 20
-camino 1 4
-camino 1 818912
-camino 4 15
-camino 1009 4382
-similares 1 5
-similares 4 10
-recomendar 100 2
-recomendar 145 20
-exit
+ayuda distancias
+distancias 9
+distancias 2000
+ayuda estadisticas
+estadisticas
+ayuda comunidades
+comunidades
+ayuda ayuda
+ayuda ?
+ayuda exit
+comandos desconocidos o erroneos
+? ?
+similares
+similares 1
+similares 1 2 3 
+similares 9 0
+similares 9 -3
+similares 3 abc
+similares abc 9
+ayuda similares
+recomendar
+recomendar 1
+recomendar 1 2 3
+recomendar 9 0
+recomendar 9 -3
+recomendar 3 abc
+recomendar abc 9
+ayuda recomendar
+camino 
+camino 1
+camino 1 2 3
+camino -1 1
+camino 1 -1
+camino -1 -1
+ayuda camino
+centralidad
+centralidad 1 2
+centralidad -3
+centralidad 0
+centralidad abc
+ayuda centralidad
+distancias 
+distancias 1 2 3
+distancias -3
+distancias 0
+distancias abc
+ayuda distancias
+estadisticas 1 2 3
+estadisticas abc
+ayuda estadisticas
+comunidades 1 2 3
+comunidades abc
+ayuda comunidades
+ayuda
+ayuda desconocido
+ayuda erroneo
+ayuda ayuda
+?
